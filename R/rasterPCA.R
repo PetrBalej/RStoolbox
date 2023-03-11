@@ -59,7 +59,7 @@ rasterPCA <- function(img, nSamples = NULL, nComp = nlayers(img), spca = FALSE, 
     if(!is.null(nSamples)){    
         trainData <- sampleRandom(img, size = nSamples, na.rm = TRUE)
         if(nrow(trainData) < nlayers(img)) stop("nSamples too small or img contains a layer with NAs only")
-        model <- princomp(trainData, scores = FALSE, cor = spca)
+        model <- princomp(trainData, scores = TRUE, cor = spca)
     } else {
         if(maskCheck) {
             totalMask <- !sum(calc(img, is.na))
@@ -67,7 +67,7 @@ rasterPCA <- function(img, nSamples = NULL, nComp = nlayers(img), spca = FALSE, 
             img <- mask(img, totalMask , maskvalue = 0) ## NA areas must be masked from all layers, otherwise the covariance matrix is not non-negative definite   
         }
         covMat <- layerStats(img, stat = "cov", na.rm = TRUE)
-        model  <- princomp(covmat = covMat[[1]], cor=spca)
+        model  <- princomp(covmat = covMat[[1]], cor=spca, scores = TRUE)
         model$center <- covMat$mean
         model$n.obs  <- cellStats(!any(is.na(img)), sum)
         if(spca) {    
